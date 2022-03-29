@@ -7,27 +7,36 @@ nested_list = [
     [1, 2, None],
 ]
 
-nested_items = []
+# nested_items = []
 
 class FlatIterator:
     def __init__(self, _list):
-        self._list = _list
+        self.list = _list
 
     def __iter__(self):
-        self.cursor = 0
+        self.main_list_cursor = 0
+        self.nested_list_cursor = 0
         return self
 
     def __next__(self):
-        if self.cursor < len(self._list):
-            _item = self._list[self.cursor]
-            self.cursor += 1
-            if type(_item) == list:
-                nested_items.extend(_item)
+        if self.main_list_cursor < len(self.list):
+            if type(self.list[self.main_list_cursor]) == list:
+                if self.nested_list_cursor < len(self.list[self.main_list_cursor]) - 1:
+                    list_item = self.list[self.main_list_cursor][self.nested_list_cursor]
+                    self.nested_list_cursor += 1
+                    # список разбирается до предпоследнего значения, последнее выводится в else ниже,
+                    # чтобы при итерации не получались лишние None
+                else:
+                    list_item = self.list[self.main_list_cursor][self.nested_list_cursor]
+                    self.main_list_cursor += 1
+                    self.nested_list_cursor = 0
             else:
-                nested_items.append(_item)
-            return nested_items
+                list_item = self.list[self.main_list_cursor]
+                self.main_list_cursor += 1
+                self.nested_list_cursor = 0
         else:
             raise StopIteration
+        return list_item
 
 
 if __name__ == '__main__':
